@@ -1,4 +1,4 @@
-#include "WebSocket.h"
+#include "WebSocket.hpp"
 
 WebSocket::WebSocket(int port) {
   _port = port;
@@ -148,21 +148,7 @@ std::map<std::string, std::string> WebSocket::parseHttpHeaders(char *msg, int si
 }
 
 void WebSocket::readFrame(std::string frame) {
-  std::map<std::string, std::string> f;
-
-  std::bitset fOne = std::bitset<8>(frame.c_str()[0]);
-
-  // f["fin"] = fOne[0];
-  // f["maskBit"] = fOne[7];
-  // // f["mask"];
-  // f["payloadLength"] = 
-
-
-  for (unsigned int i = 0; i < frame.size(); i++) {
-    std::cout << std::bitset<8>(frame.c_str()[i]);
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
+  WebSocketFrame f = WebSocketFrame(frame);
 
   return;
 }

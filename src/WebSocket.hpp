@@ -3,6 +3,7 @@
 
 #define WSGUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
+// system
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
@@ -15,11 +16,14 @@
 #include <sys/socket.h>
 #include <iostream>
 #include <bitset>
-
 #include <map>
 #include <string>
 
-#include "cryptlite/sha1.h"
+// libs
+#include <cryptlite/sha1.h>
+
+// ours
+#include "WebSocketFrame.hpp"
 
 class WebSocket {
   public:
