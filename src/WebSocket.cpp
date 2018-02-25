@@ -142,6 +142,5 @@ std::map<std::string, std::string> WebSocket::parseHttpHeaders(char *msg, int si
     }
   }
 
-  // Misc::PrintMap(header);
   return header;
 }
