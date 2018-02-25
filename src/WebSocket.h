@@ -14,6 +14,7 @@
 #include <time.h> 
 #include <sys/socket.h>
 #include <iostream>
+#include <bitset>
 
 #include <map>
 #include <string>
@@ -30,6 +31,8 @@ class WebSocket {
      * return a map<string, string>
     */
     std::map<std::string, std::string> parseHttpHeaders(char *msg, int size);
+    void readFrame(std::string frame);
+    bool getBit(unsigned char byte, int position);
 
     int _port;
     int _sockfd;

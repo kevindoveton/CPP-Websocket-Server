@@ -65,7 +65,9 @@ WebSocket::WebSocket(int port) {
         accepted = true;
       } else {
         // client has already been accepted
-        std::cout << client_message << std::endl;
+        std::cout << "Reading Frame" << std::endl;
+        std::string frame = client_message;
+        readFrame(frame);
       }
       memset( &client_message, 0, sizeof(client_message));
     }
@@ -143,4 +145,24 @@ std::map<std::string, std::string> WebSocket::parseHttpHeaders(char *msg, int si
   }
 
   return header;
+}
+
+void WebSocket::readFrame(std::string frame) {
+  std::map<std::string, std::string> f;
+
+  std::bitset fOne = std::bitset<8>(frame.c_str()[0]);
+
+  // f["fin"] = fOne[0];
+  // f["maskBit"] = fOne[7];
+  // // f["mask"];
+  // f["payloadLength"] = 
+
+
+  for (unsigned int i = 0; i < frame.size(); i++) {
+    std::cout << std::bitset<8>(frame.c_str()[i]);
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  return;
 }
