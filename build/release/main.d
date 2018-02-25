@@ -1,6 +1,5 @@
-build/release/main.o: src/main.cpp libs/cryptlite/sha1.h \
- libs/cryptlite/base64.h
+build/release/main.o: src/main.cpp src/main.h src/WebSocket.h
 
-libs/cryptlite/sha1.h:
+src/main.h:
 
-libs/cryptlite/base64.h:
+src/WebSocket.h:

@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include <cstring>
 #include <cassert>
 #include <iomanip>
-#include <boost/cstdint.hpp>
 
 namespace cryptlite {
 
@@ -45,16 +44,16 @@ public:
     static void calc(
             const char* text, int text_len,
             const char* key,  int key_len,
-            boost::uint8_t digest[HASH_SIZE]) {
+            unsigned char digest[HASH_SIZE]) {
         assert(digest);
-        calc(reinterpret_cast<const boost::uint8_t*>(text), text_len,
-             reinterpret_cast<const boost::uint8_t*>(key), key_len, digest);
+        calc(reinterpret_cast<const unsigned char*>(text), text_len,
+             reinterpret_cast<const unsigned char*>(key), key_len, digest);
     }
 
     static void calc(
-            const boost::uint8_t* text, int text_len,
-            const boost::uint8_t* key,  int key_len,
-            boost::uint8_t digest[HASH_SIZE]) {
+            const unsigned char* text, int text_len,
+            const unsigned char* key,  int key_len,
+            unsigned char digest[HASH_SIZE]) {
         assert(digest);
         hmac<T> ctx(key, key_len);
         ctx.input(text, text_len);
@@ -64,7 +63,7 @@ public:
     inline static void calc(
             const std::string& text,
             const std::string& key,
-            boost::uint8_t digest[HASH_SIZE]) {
+            unsigned char digest[HASH_SIZE]) {
         assert(digest);
         calc(reinterpret_cast<const char*>(text.c_str()), text.size(),
              reinterpret_cast<const char*>(key.c_str()), key.size(), digest);
@@ -73,15 +72,15 @@ public:
     inline static std::string calc_hex(
             const std::string& text,
             const std::string& key ) {
-        return calc_hex(reinterpret_cast<const boost::uint8_t*>(text.c_str()), text.size(),
-                reinterpret_cast<const boost::uint8_t*>(key.c_str()), key.size());
+        return calc_hex(reinterpret_cast<const unsigned char*>(text.c_str()), text.size(),
+                reinterpret_cast<const unsigned char*>(key.c_str()), key.size());
     }
 
     static std::string calc_hex(
-            const boost::uint8_t* text, int text_len,
-            const boost::uint8_t* key,  int key_len ) {
+            const unsigned char* text, int text_len,
+            const unsigned char* key,  int key_len ) {
         int i;
-        boost::uint8_t digest[HASH_SIZE];
+        unsigned char digest[HASH_SIZE];
         assert(key);
         assert(text);
         std::ostringstream oss;
@@ -95,26 +94,26 @@ public:
         return oss.str();
     }
 
-    hmac(const boost::uint8_t* key, int key_len) : hasher_(T()) {
+    hmac(const unsigned char* key, int key_len) : hasher_(T()) {
         assert(key);
         reset(key, key_len);
     }
 
     hmac(const std::string& key) : hasher_(T()) {
-        reset(reinterpret_cast<const boost::uint8_t*>(key.c_str()), key.size());
+        reset(reinterpret_cast<const unsigned char*>(key.c_str()), key.size());
     }
 
     ~hmac() { }
 
     inline void reset(const std::string& key) {
-        reset(reinterpret_cast<const boost::uint8_t*>(key.c_str()), key.size());
+        reset(reinterpret_cast<const unsigned char*>(key.c_str()), key.size());
     }
 
-    void reset(const boost::uint8_t* key, int key_len) {
+    void reset(const unsigned char* key, int key_len) {
 
         int i;
-        boost::uint8_t k_ipad[BLOCK_SIZE];
-        boost::uint8_t tempkey[HASH_SIZE];
+        unsigned char k_ipad[BLOCK_SIZE];
+        unsigned char tempkey[HASH_SIZE];
 
         assert(key);
 
@@ -141,19 +140,19 @@ public:
     }
 
     inline void input(const std::string& text) {
-        input(reinterpret_cast<const boost::uint8_t*>(text.c_str()), text.size());
+        input(reinterpret_cast<const unsigned char*>(text.c_str()), text.size());
     }
 
-    void input(const boost::uint8_t* text, int text_len) {
+    void input(const unsigned char* text, int text_len) {
         assert(text);
         hasher_.input(text, text_len);
     }
 
-    void final_bits(const boost::uint8_t bits, unsigned int bitcount) {
+    void final_bits(const unsigned char bits, unsigned int bitcount) {
         hasher_.final_bits(bits, bitcount);
     }
 
-    void result(boost::uint8_t digest[HASH_SIZE]) {
+    void result(unsigned char digest[HASH_SIZE]) {
         assert(digest);
         hasher_.result(digest);
         hasher_.reset();
@@ -163,7 +162,7 @@ public:
     }
 
 private:
-    boost::uint8_t k_opad_[BLOCK_SIZE];
+    unsigned char k_opad_[BLOCK_SIZE];
     T hasher_;
 }; // end of class
 

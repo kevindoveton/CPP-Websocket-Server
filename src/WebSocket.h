@@ -18,7 +18,7 @@
 #include <map>
 #include <string>
 
-#include "Misc.h"
+#include "cryptlite/sha1.h"
 
 class WebSocket {
   public:

@@ -42,40 +42,33 @@ WebSocket::WebSocket(int port) {
   }
   puts("Connection accepted");
 
+  bool accepted = false;
   //Receive a message from client
-  while( (read_size = read(client_sock , client_message , sizeof(client_message))) > 0 )
-  {
-    //Send the message back to client
-    // write(client_sock , client_message , strlen(client_message));
-    std::cout << client_message << std::endl;
-    std::map<std::string, std::string> headers = parseHttpHeaders(client_message, read_size);
-    std::cout << headers["Sec-WebSocket-Key"] + WSGUID << std::endl;
+  while (true) { // we'll worry about efficiency later
+    while( (read_size = read(client_sock , client_message , sizeof(client_message))) > 0 )
+    {
+      
+      if (!accepted) {
+        // get the http headers
+        std::map<std::string, std::string> headers = parseHttpHeaders(client_message, read_size);
 
-    unsigned char *hashArr;
-    hashArr = (unsigned char*)malloc(20);
-    memset(hashArr, 0, sizeof(unsigned char) * 20);
+        // generate the sec-websocket-accept key 
+        std::string key = headers["Sec-WebSocket-Key"];
+        key += WSGUID;
+        std::string hash = cryptlite::sha1::hash_base64(key);
 
-    // Misc::sha1( headers["Sec-WebSocket-Key"] + WSGUID, hashArr );
-    Misc::sha1("dGhlIHNhbXBsZSBub25jZQ==258EAFA5-E914-47DA-95CAC5AB0DC85B11", hashArr);
-    std::cout << hashArr << std::endl;
-    
-    // std::string hash = "";
-    std::string hash = Misc::base64_encode( hashArr, 20 );
-    std::cout << hash << std::endl;
-    std::string res = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " + hash + "\r\n\r\n";
-    write(client_sock, res.c_str(), strlen(res.c_str()));
-    memset( &client_message, 0, sizeof(client_message));
-    // close(client_sock);
-  }
+        // send a http response
+        std::string res = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " + hash + "\r\n\r\n";
+        write(client_sock, res.c_str(), strlen(res.c_str()));
 
-  if(read_size == 0)
-  {
-    puts("Client disconnected");
-    fflush(stdout);
-  }
-  else if(read_size == -1)
-  {
-    perror("recv failed");
+        // mark the client as accepted
+        accepted = true;
+      } else {
+        // client has already been accepted
+        std::cout << client_message << std::endl;
+      }
+      memset( &client_message, 0, sizeof(client_message));
+    }
   }
 }
 
@@ -149,10 +142,6 @@ std::map<std::string, std::string> WebSocket::parseHttpHeaders(char *msg, int si
     }
   }
 
-  Misc::PrintMap(header);
+  // Misc::PrintMap(header);
   return header;
-
-  // std::cout << "MSG: " << std::endl
-  //           << msg << std::endl
-  //           << "Count: " << size << std::endl;
 }

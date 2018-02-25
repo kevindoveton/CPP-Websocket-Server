@@ -1,5 +1,3 @@
-build/release/WebSocket.o: src/WebSocket.cpp src/WebSocket.h src/Misc.h
+build/release/WebSocket.o: src/WebSocket.cpp src/WebSocket.h
 
 src/WebSocket.h:
-
-src/Misc.h:
