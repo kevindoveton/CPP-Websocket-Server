@@ -1,0 +1,12 @@
+<!doctype HTML>
+<html>
+  <head>
+    <script>
+      let ws = new WebSocket("ws://localhost:3000/echo");
+      ws.onopen = function () {
+        ws.send("Message to send");
+      };
+    </script>
+  </head>
+  <body></body>
+</html>
