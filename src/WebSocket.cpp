@@ -68,6 +68,7 @@ WebSocket::WebSocket(int port) {
         std::cout << "Reading Frame" << std::endl;
         std::string frame = client_message;
         readFrame(frame);
+        std::cout << "End of frame" << std::endl;
       }
       memset( &client_message, 0, sizeof(client_message));
     }
@@ -148,7 +149,7 @@ std::map<std::string, std::string> WebSocket::parseHttpHeaders(char *msg, int si
 }
 
 void WebSocket::readFrame(std::string frame) {
+  // std::cout << frame << std::endl;
   WebSocketFrame f = WebSocketFrame(frame);
-
   return;
 }

@@ -7,8 +7,7 @@ WebSocketFrame::WebSocketFrame() {
 
 WebSocketFrame::WebSocketFrame(std::string f) {
   reset();
-  readFrame(f);
-  return;
+  return readFrame(f);
 }
 
 bool WebSocketFrame::readFrame(std::string f) {
@@ -29,26 +28,37 @@ bool WebSocketFrame::readFrame(std::string f) {
 
   if (_payloadLength == 126) {
     payloadExtraBytes = 2;
+    // std::cout << "126..." << std::endl;
   } else if (_payloadLength == 127) {
     payloadExtraBytes = 4;
+    // std::cout << "127..." << std::endl;
   }
 
   // add the extra payload bytes to length
   for (unsigned int i = 0; i < payloadExtraBytes; i++) {
     std::bitset<8> bits = std::bitset<8>( f.c_str()[2 + i] );
+    // std::cout << 2 + i << std::endl;
     _payloadLength += bits.to_ulong();
   }
 
+  // std::cout << _payloadLength << std::endl;
+
   // byte 3(ish) - get the mask
   for (unsigned int i = 0; i < 4; i++) {
-    std::bitset<8> maskSection = std::bitset<8>( f.c_str()[3 + payloadExtraBytes + i] );
+    std::bitset<8> maskSection = std::bitset<8>( f.c_str()[2 + payloadExtraBytes + i] );
     _mask[i] = maskSection;
+    // std::cout << maskSection.to_ulong() << std::endl;
   }
 
+
+  std::cout << "MSG: ";
   for (unsigned int i = 0; i < _payloadLength; i++) {
-    const char c = f.c_str()[i + 7 + payloadExtraBytes] ^ _mask[i % 4].to_ulong();
+    // std::cout << i + 6 + payloadExtraBytes << " - " << i << " - ";
+    const char c = f.c_str()[i + 6 + payloadExtraBytes] ^ _mask[i % 4].to_ulong();
+    // std::cout << c << std::endl;
     std::cout << c;
   }
+
   std::cout << std::endl;
 
   return true;
