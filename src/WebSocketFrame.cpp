@@ -7,7 +7,8 @@ WebSocketFrame::WebSocketFrame() {
 
 WebSocketFrame::WebSocketFrame(std::string f) {
   reset();
-  return readFrame(f);
+  readFrame(f);
+  return;
 }
 
 bool WebSocketFrame::readFrame(std::string f) {
