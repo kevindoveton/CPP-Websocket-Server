@@ -8,7 +8,7 @@ SRC_EXT = cpp
 # Path to the source directory, relative to the makefile
 SRC_PATH = .
 # Space-separated pkg-config libraries used by this project
-LIBS = libcrypto
+LIBS = 
 # General compiler flags
 COMPILE_FLAGS = -std=c++14 -Wall -Wextra -g
 # Additional release-specific flags

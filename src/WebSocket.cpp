@@ -58,7 +58,9 @@ WebSocket::WebSocket(int port) {
         std::string hash = cryptlite::sha1::hash_base64(key);
 
         // send a http response
-        std::string res = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " + hash + "\r\n\r\n";
+        std::string res = "HTTP/1.1 101 Switching Protocols\r\n"
+                          "Upgrade: websocket\r\n"
+                          "Connection: Upgrade\r\nSec-WebSocket-Accept: " + hash + "\r\n\r\n";
         write(client_sock, res.c_str(), strlen(res.c_str()));
 
         // mark the client as accepted
