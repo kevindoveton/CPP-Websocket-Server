@@ -1,3 +1,0 @@
-/mnt/c/Users/Kevin Doveton/CLionProjects/CPP-Web-Socket/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/Kevin Doveton/CLionProjects/CPP-Web-Socket/cmake-build-debug/CMakeFiles/edit_cache.dir
-/mnt/c/Users/Kevin Doveton/CLionProjects/CPP-Web-Socket/cmake-build-debug/CMakeFiles/CPP_Web_Socket.dir
