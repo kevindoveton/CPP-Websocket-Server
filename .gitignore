@@ -1,6 +1,2 @@
-build
-bin
-*.swp
-*.d
-*.o
-websocket # link to build
+cmake-build-debug
+

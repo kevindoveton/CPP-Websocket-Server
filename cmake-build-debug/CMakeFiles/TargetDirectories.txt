@@ -1,3 +1,0 @@
-/Users/kevindoveton/dev/kevindoveton/CPP-Websocket-Server/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/kevindoveton/dev/kevindoveton/CPP-Websocket-Server/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/kevindoveton/dev/kevindoveton/CPP-Websocket-Server/cmake-build-debug/CMakeFiles/CPP_Websocket_Server.dir

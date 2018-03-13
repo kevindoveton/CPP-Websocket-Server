@@ -1,46 +1,36 @@
-#ifndef KDWEBSOCKET_H
-#define KDWEBSOCKET_H
+//
+// Created by Kevin Doveton on 11/03/2018.
+//
 
-#define WSGUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+#ifndef CPP_WEB_SOCKET_WEBSOCKET_HPP
+#define CPP_WEB_SOCKET_WEBSOCKET_HPP
 
-// system
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/types.h>
-#include <time.h> 
-#include <sys/socket.h>
-#include <iostream>
-#include <bitset>
+
+#include <cstdint>
+#include <stdint-gcc.h>
 #include <map>
-#include <string>
+#include "Http.hpp"
+#include "Handler.hpp"
+#include "WebSocketConnection.hpp"
 
-// libs
-#include <cryptlite/sha1.h>
+class WebSocketConnection;
+class Handler;
 
-// ours
-#include "WebSocketFrame.hpp"
-
-class WebSocket {
+class WebSocket : public Handler {
   public:
-    explicit WebSocket(int port);
-  private:
-    /*
-     * quite possibly the worst implementation ever
-     * parse the http headers
-     * return a map<string, string>
-    */
-    std::map<std::string, std::string> parseHttpHeaders(char *msg, int size);
-    void readFrame(std::string frame);
-    bool getBit(unsigned char byte, int position);
+    explicit WebSocket(uint16_t port);
+    ~WebSocket();
+    void On(int e, void (*f)());
+    void Broadcast(std::string msg);
+    void AddClient( struct sockaddr_in client, int client_sock);
+    int Handle(epoll_event e) override;
+    enum { OPEN, CLOSE, MESSAGE };
 
-    int _port;
-    int _sockfd;
-    struct sockaddr_in _server;
+  protected:
+    std::map <int, void(*)()> _eventFunc;
+    std::map<int, WebSocketConnection*> _connections;
+    int t;
 };
 
-#endif
+
+#endif //CPP_WEB_SOCKET_WEBSOCKET_HPP

@@ -1,14 +1,17 @@
-cmake_minimum_required(VERSION 3.9)
-project(CPP_Websocket_Server)
+cmake_minimum_required(VERSION 3.5)
+project(CPP_Web_Socket)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(CPP_Websocket_Server
-        src/main.cpp
-        src/main.hpp
-        src/WebSocket.cpp
-        src/WebSocket.hpp
+include_directories( libs )
+
+add_executable(CPP_Web_Socket
+        src/Main.cpp
+        src/Main.hpp
+        src/WebSocketConnection.cpp
+        src/WebSocketConnection.hpp
         src/WebSocketFrame.cpp
         src/WebSocketFrame.hpp
-        test/main.test.cpp
-        test/WebSocket.test.cpp src/HttpServer.cpp src/HttpServer.h)
+        src/Http.cpp
+        src/Http.hpp
+        src/Utils.hpp src/WebSocket.cpp src/WebSocket.hpp src/EventLoop.cpp src/EventLoop.hpp src/Handler.hpp src/WebSocketEvents.cpp src/WebSocketEvents.hpp)
