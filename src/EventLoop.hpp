@@ -12,6 +12,9 @@
 
 #define EPOLL_MAX_EVENTS 10
 
+class Handler;
+class WebSocket;
+
 class EventLoop {
   public:
     EventLoop();
@@ -21,7 +24,7 @@ class EventLoop {
   protected:
     int _epfd;
     int _nfds;
-    struct epoll_event _events[EPOLL_MAX_EVENTS];
+    int _call;
     int _maxEvents;
     int _timeout;
     std::map<int, Handler* > _handlers;

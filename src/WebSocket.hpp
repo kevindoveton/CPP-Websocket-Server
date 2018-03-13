@@ -11,12 +11,15 @@
 #include <map>
 #include "Http.hpp"
 #include "Handler.hpp"
+#include "WebSocketConnection.hpp"
 
+class WebSocketConnection;
 class Handler;
 
 class WebSocket : public Handler {
   public:
     explicit WebSocket(uint16_t port);
+    ~WebSocket();
     void On(int e, void (*f)());
     void Broadcast(std::string msg);
     void AddClient( struct sockaddr_in client, int client_sock);
@@ -25,7 +28,8 @@ class WebSocket : public Handler {
 
   protected:
     std::map <int, void(*)()> _eventFunc;
-    std::vector<WebSocketConnection*> _connections;
+    std::map<int, WebSocketConnection*> _connections;
+    int t;
 };
 
 

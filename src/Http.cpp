@@ -6,6 +6,7 @@
 
 Http::Http(uint16_t port, WebSocket *ws) {
   _port = port;
+  _ws = ws;
 
   // set up socket
   _sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -40,10 +41,7 @@ Http::Http(uint16_t port, WebSocket *ws) {
 }
 
 Http::~Http() {
-  std::vector<WebSocketConnection*>::iterator it;
-  for (it = _connections.begin(); it != _connections.end(); ++it) {
-    delete *it;
-  }
+
 }
 
 std::map<std::string, std::string> Http::ParseHttpHeaders(char *msg, ssize_t readSize) {
@@ -124,9 +122,9 @@ std::map<std::string, std::string> Http::ParseHttpHeaders(char *msg, ssize_t rea
 
 
 int Http::Handle(epoll_event e) {
-
   struct sockaddr_in client;
   int clientFd = accept(_sockfd, (struct sockaddr *) &client, (socklen_t *) &_sizeofSock);
+  std::cout << "client: "  << clientFd << std::endl;
 
   if (clientFd < 0) {
     std::cerr << "Accept failed" << std::endl;

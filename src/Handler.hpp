@@ -18,10 +18,11 @@ class Handler {
     virtual int Handle(epoll_event e) = 0;
     void inline SetNonBlocking(int fd) { _flags = fcntl(fd, F_GETFL, 0); fcntl(fd, F_SETFL, _flags | O_NONBLOCK);}
     void inline SetEventLoopInstance(EventLoop *ev) { _ev = ev; }
-    int _flags;
 
   protected:
     EventLoop *_ev;
+    int _flags;
+
 };
 
 

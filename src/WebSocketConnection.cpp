@@ -8,8 +8,8 @@ WebSocketConnection::WebSocketConnection(struct sockaddr_in client, int clientFd
   _accepted = false;
   _client = client;
   _clientFd = clientFd;
-
-  manage();
+  AcceptConnection();
+//  manage();
 }
 
 WebSocketConnection::~WebSocketConnection() {
@@ -17,40 +17,20 @@ WebSocketConnection::~WebSocketConnection() {
 }
 
 void WebSocketConnection::manage() {
-  char client_message[2500];
-  ssize_t read_size;
-  while( (read_size = read(_clientFd, client_message , sizeof(client_message))) > 0 ) {
-    if (!_accepted) {
-
-      // get the http headers
-      std::map<std::string, std::string> headers = Http::ParseHttpHeaders(client_message, read_size);
-
-      // generate the sec-websocket-accept key
-      std::string key = headers[ "Sec-WebSocket-Key" ];
-      key += WSGUID;
-
-      std::string hash = cryptlite::sha1::hash_base64(key);
-
-      // send a http response
-      std::string res = "HTTP/1.1 101 Switching Protocols\r\n"
-                        "Upgrade: websocket\r\n"
-                        "Connection: Upgrade\r\nSec-WebSocket-Accept: " + hash + "\r\n\r\n";
-      write(_clientFd, res.c_str(), strlen(res.c_str()));
-
-      // mark the client as accepted
-      _accepted = true;
-
-    } else {
-
-      // client has already been accepted
-      std::cout << "Reading Frame" << std::endl;
-      std::string frame = client_message;
-      WebSocketFrame f = WebSocketFrame(frame);
-      std::cout << "End of frame" << std::endl;
-    }
-
-    memset(&client_message, 0, sizeof(client_message));
-  }
+//  char client_message[2500];
+//  ssize_t read_size;
+//  while( (read_size = read(_clientFd, client_message , sizeof(client_message))) > 0 ) {
+//    if (!_accepted) {
+//
+//      AcceptConnection();
+//
+//    } else {
+//
+//
+//    }
+//
+//    memset(&client_message, 0, sizeof(client_message));
+//  }
 }
 
 void WebSocketConnection::CloseConnection() {
@@ -77,5 +57,54 @@ void WebSocketConnection::closeSocket() {
   shutdown(_clientFd, SHUT_WR);
   while (recv(_clientFd, nullptr, 1, 0) > 0);
   close(_clientFd);
+}
+
+void WebSocketConnection::AcceptConnection() {
+  if (_accepted) { return; }
+
+  std::cout << "Accept" << std::endl;
+  ssize_t read_size;
+  char client_message[2500];
+  while ((read_size = read(_clientFd, client_message , sizeof(client_message))) < 0) { std::cout << "waiting" << std::endl; }
+  std::cout << read_size << std::endl;
+  // get the http headers
+  std::map<std::string, std::string> headers = Http::ParseHttpHeaders(client_message, read_size);
+
+  // generate the sec-websocket-accept key
+  std::string key = headers[ "Sec-WebSocket-Key" ];
+  key += WSGUID;
+
+  std::string hash = cryptlite::sha1::hash_base64(key);
+
+  // send a http response
+  std::string res = "HTTP/1.1 101 Switching Protocols\r\n"
+                    "Upgrade: websocket\r\n"
+                    "Connection: Upgrade\r\n"
+                    "Sec-WebSocket-Accept: " + hash + "\r\n\r\n";
+  write(_clientFd, res.c_str(), strlen(res.c_str()));
+
+  // mark the client as accepted
+  _accepted = true;
+
+  std::cout << "Accepted Connection" << std::endl;
+
+}
+
+std::string WebSocketConnection::GetMessage() {
+  if (!_accepted) {
+    return "";
+  }
+
+  ssize_t read_size;
+  char client_message[2500];
+  while ((read_size = read(_clientFd, client_message , sizeof(client_message))) < 0) { std::cout << "waiting" << std::endl; }
+//  read_size = read(_clientFd, client_message , sizeof(client_message));
+
+  // client has already been accepted
+  std::cout << "Reading Frame" << std::endl;
+  std::string frame = client_message;
+  WebSocketFrame f = WebSocketFrame(frame);
+  std::cout << "End of frame" << std::endl;
+  return std::__cxx11::string();
 }
 

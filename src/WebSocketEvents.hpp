@@ -10,7 +10,7 @@
 
 class WebSocketEvents {
   public:
-    static void onMsg() { std::cout << "Got Message" << std::endl; }
+    static void onMsg() { std::cout << "Got Message woooo!" << std::endl; }
 };
 
 

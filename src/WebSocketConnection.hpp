@@ -33,6 +33,8 @@ class WebSocketConnection {
     WebSocketConnection(struct sockaddr_in client, int clientFd);
     ~WebSocketConnection();
     void CloseConnection();
+    void AcceptConnection();
+    std::string GetMessage();
     void Ping();
     void Pong();
 
