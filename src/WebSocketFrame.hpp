@@ -22,7 +22,8 @@ class WebSocketFrame {
 
     bool ReadFrame(std::string f);
     std::string GetFrame();
-
+    std::string GetPayload() { return _payloadData; }
+    int GetOpcode() { return (int)_opcode; };
     void Reset();
 
     // Sec 5.2, Page 29 Opcode

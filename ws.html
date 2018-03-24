@@ -1,13 +1,68 @@
 <!doctype HTML>
 <html>
   <head>
+    <style>
+      pre {
+        background: #f0f0f0;
+        max-width: 80ch;
+        min-height: 10rem;
+        padding: 1rem;
+      }
+      .buttons {
+        margin-top: 1rem;
+      }
+    </style>
     <script>
-      let ws = new WebSocket("ws://192.168.1.97:3000/echo");
-      // let ws = new WebSocket("ws://localhost:3000/echo");
-      ws.onopen = function () {
-        ws.send("this is a message");
-      };
+      let ws;
+
+      function addMessage(msg) {
+          let d = document.querySelector('#data');
+          d.innerHTML += msg + '\n';
+      }
+
+      function disconnect() {
+          ws.close();
+      }
+
+      function connect() {
+          let addr = "ws://192.168.1.97:3000/";
+
+          ws = new WebSocket(addr);
+
+          ws.onopen = function() {
+              addMessage('Web Socket opened at ' + addr + '.');
+          }
+
+          ws.onmessage = function (ev) {
+              addMessage(ev.data);
+          }
+
+          ws.onclose = function (ev) {
+              addMessage('Connection closed');
+          }
+      }
+
+      function send() {
+          let msg = document.querySelector('.msg-text').value;
+          ws.send(msg);
+      }
     </script>
   </head>
-  <body></body>
+  <body>
+
+    <div>
+      <pre id="data"></pre>
+    </div>
+
+    <div class="communicate">
+      <input type="text" class="msg-text" />
+      <button onclick="send()">Send</button>
+    </div>
+
+    <div class="buttons">
+      <button onclick="connect()">Connect</button>
+      <button onclick="disconnect()">Disconnect</button>
+    </div>
+
+  </body>
 </html>

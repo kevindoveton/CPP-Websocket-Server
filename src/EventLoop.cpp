@@ -40,3 +40,7 @@ void EventLoop::AddHandler(int fd, Handler *handler, unsigned int events) {
   std::cout << "Added Handler" << std::endl;
 
 }
+
+void EventLoop::RemoveHandler(int fd) {
+
+}

@@ -8,29 +8,13 @@ WebSocketConnection::WebSocketConnection(struct sockaddr_in client, int clientFd
   _accepted = false;
   _client = client;
   _clientFd = clientFd;
+  _state = STATE::UNKNOWN;
+
   AcceptConnection();
-//  manage();
 }
 
 WebSocketConnection::~WebSocketConnection() {
   CloseConnection();
-}
-
-void WebSocketConnection::manage() {
-//  char client_message[2500];
-//  ssize_t read_size;
-//  while( (read_size = read(_clientFd, client_message , sizeof(client_message))) > 0 ) {
-//    if (!_accepted) {
-//
-//      AcceptConnection();
-//
-//    } else {
-//
-//
-//    }
-//
-//    memset(&client_message, 0, sizeof(client_message));
-//  }
 }
 
 void WebSocketConnection::CloseConnection() {
@@ -41,6 +25,10 @@ void WebSocketConnection::CloseConnection() {
   m["PAYLOAD_LENGTH"] = "0";
 
   SendFrame(WebSocketFrame(m));
+  _state = STATE::CLOSING;
+
+  // TODO: wait for the client to respond to us
+
   closeSocket();
 }
 
@@ -54,9 +42,10 @@ void WebSocketConnection::SendFrame(WebSocketFrame f) {
 
 void WebSocketConnection::closeSocket() {
   // shut the connection
-  shutdown(_clientFd, SHUT_WR);
-  while (recv(_clientFd, nullptr, 1, 0) > 0);
-  close(_clientFd);
+  shutdown(_clientFd, SHUT_WR); // shut read and write
+  while (recv(_clientFd, nullptr, 1, 0) > 0); // get rid of all data - we don't really care any more
+  close(_clientFd); // close the connection
+  _state = STATE::CLOSED;
 }
 
 void WebSocketConnection::AcceptConnection() {
@@ -64,8 +53,10 @@ void WebSocketConnection::AcceptConnection() {
 
   std::cout << "Accept" << std::endl;
   ssize_t read_size;
-  char client_message[2500];
-  while ((read_size = read(_clientFd, client_message , sizeof(client_message))) < 0) { std::cout << "waiting" << std::endl; }
+  char client_message[MAX_FRAME_SIZE];
+  while ((read_size = read(_clientFd, client_message , sizeof(client_message))) < 0) {
+    std::cout << "waiting" << std::endl;
+  }
   std::cout << read_size << std::endl;
   // get the http headers
   std::map<std::string, std::string> headers = Http::ParseHttpHeaders(client_message, read_size);
@@ -80,31 +71,33 @@ void WebSocketConnection::AcceptConnection() {
   std::string res = "HTTP/1.1 101 Switching Protocols\r\n"
                     "Upgrade: websocket\r\n"
                     "Connection: Upgrade\r\n"
-                    "Sec-WebSocket-Accept: " + hash + "\r\n\r\n";
+                    "Sec-WebSocket-Accept: " + hash + "\r\n"
+                    "\r\n";
+
   write(_clientFd, res.c_str(), strlen(res.c_str()));
 
   // mark the client as accepted
   _accepted = true;
+  _state = STATE::OPEN;
 
   std::cout << "Accepted Connection" << std::endl;
 
 }
 
 std::string WebSocketConnection::GetMessage() {
-  if (!_accepted) {
-    return "";
-  }
-
-  ssize_t read_size;
-  char client_message[2500];
-  while ((read_size = read(_clientFd, client_message , sizeof(client_message))) < 0) { std::cout << "waiting" << std::endl; }
-//  read_size = read(_clientFd, client_message , sizeof(client_message));
-
-  // client has already been accepted
-  std::cout << "Reading Frame" << std::endl;
-  std::string frame = client_message;
-  WebSocketFrame f = WebSocketFrame(frame);
-  std::cout << "End of frame" << std::endl;
-  return std::__cxx11::string();
+  WebSocketFrame f = GetFrame();
+  return f.GetPayload();
 }
 
+void WebSocketConnection::SendMessage(std::string msg) {
+
+}
+
+WebSocketFrame WebSocketConnection::GetFrame() {
+  ssize_t read_size;
+  char client_message[MAX_FRAME_SIZE];
+  while ((read_size = read(_clientFd, client_message, sizeof(client_message))) < 0) { /* busy wait */ }
+  std::string frame = client_message;
+
+  return WebSocketFrame(frame);
+}

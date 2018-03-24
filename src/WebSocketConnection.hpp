@@ -6,6 +6,7 @@
 #define CPP_WEB_SOCKET_WEBSOCKETCONNECTION_HPP
 
 #define WSGUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+#define MAX_FRAME_SIZE 2500
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -37,17 +38,25 @@ class WebSocketConnection {
     std::string GetMessage();
     void Ping();
     void Pong();
+    void SendMessage(std::string msg);
 
     void SendFrame(WebSocketFrame f);
-//    void upgradeConnection();
+    WebSocketFrame GetFrame();
+
+    enum STATE { OPEN, CLOSING, CLOSED, UNKNOWN };
 
   protected:
-    void manage();
     void closeSocket();
 
     bool _accepted;
     int _clientFd;
     struct sockaddr_in _client;
+
+    /*
+     * _state
+     * The current state of the connection
+    */
+    int _state;
 };
 
 

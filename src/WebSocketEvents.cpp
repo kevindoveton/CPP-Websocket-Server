@@ -3,3 +3,7 @@
 //
 
 #include "WebSocketEvents.hpp"
+
+void WebSocketEvents::onMsg(HandlerEvent_t e) {
+  std::cout << e.wsFrame.GetPayload() << std::endl;
+}

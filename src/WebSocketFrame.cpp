@@ -58,7 +58,6 @@ bool WebSocketFrame::ReadFrame(std::string f) {
   }
 
 
-  std::cout << "MSG: ";
   std::stringstream payloadData;
   for (unsigned int i = 0; i < _payloadLength; i++) {
     const char c = f.c_str()[i + 6 + payloadExtraBytes] ^ _mask[i % 4].to_ulong();
@@ -66,7 +65,6 @@ bool WebSocketFrame::ReadFrame(std::string f) {
   }
 
   _payloadData = payloadData.str();
-  std::cout << _payloadData << std::endl;
 
   return true;
 }
@@ -138,3 +136,4 @@ void WebSocketFrame::Reset() {
   _payloadData = "";
   _payloadLength = 0;
 }
+

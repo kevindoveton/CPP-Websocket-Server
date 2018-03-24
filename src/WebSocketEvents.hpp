@@ -7,10 +7,11 @@
 
 
 #include <iostream>
+#include "WebSocket.hpp"
 
 class WebSocketEvents {
   public:
-    static void onMsg() { std::cout << "Got Message woooo!" << std::endl; }
+    static void onMsg(HandlerEvent_t e);
 };
 
 

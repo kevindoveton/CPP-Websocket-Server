@@ -20,7 +20,7 @@ class EventLoop {
     EventLoop();
     void Run();
     void AddHandler(int fd, Handler *handler, unsigned int events);
-
+    void RemoveHandler(int fd);
   protected:
     int _epfd;
     int _nfds;
