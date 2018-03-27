@@ -12,7 +12,6 @@ void WebSocket::On(int e, WS_CB_FUNC f) {
 }
 
 int WebSocket::Handle(epoll_event e) {
-  // TODO: change
   int fd = e.data.fd;
   WebSocketFrame f;
   if (e.events & EPOLLHUP) {

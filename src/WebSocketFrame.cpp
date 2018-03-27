@@ -26,7 +26,7 @@ bool WebSocketFrame::ReadFrame(std::string f) {
   std::bitset<8> bOne = std::bitset<8>(f.c_str()[0]);
   _fin = bOne.test(0);
   _opcode = bOne.to_ulong() & 0b00001111; // NOTE: bits 4 and 5 are not ever used.. but part of the spec
-  std::cout << _opcode << std::endl;
+//  std::cout << _opcode << std::endl;
   // byte 2 - mask and payload length
   std::bitset<8> bTwo = std::bitset<8>(f.c_str()[1]);
   _maskBit = bTwo.test(7);

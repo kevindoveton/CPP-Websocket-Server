@@ -30,7 +30,7 @@
           ws = new WebSocket(addr);
 
           ws.onopen = function() {
-              addMessage('Web Socket opened at ' + addr + '.');
+              addMessage('Web Socket opened at ' + addr);
           }
 
           ws.onmessage = function (ev) {
