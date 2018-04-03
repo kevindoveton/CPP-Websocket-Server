@@ -78,6 +78,7 @@ class WebSocket : public Handler {
     */
     enum { OPEN, CLOSE, MESSAGE };
 
+    void isInit() { std::cout << "ini" << _init << std::endl; }
   protected:
     /*
      * _eventFunc
@@ -94,6 +95,8 @@ class WebSocket : public Handler {
      * WebSocketConnection* - pointer to the connection object
     */
     std::map<int, WebSocketConnection*> _connections;
+
+    int _init = 0;
 };
 
 

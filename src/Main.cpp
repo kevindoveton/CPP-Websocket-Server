@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   Http http = Http(port, &ws);
 
   ev.AddHandler(http.GetFd(), &http, EPOLLIN);
-
+  std::cout << http.GetFd() << std::endl;
   ev.Run();
 
   return 0;

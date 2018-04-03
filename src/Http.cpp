@@ -11,7 +11,7 @@ Http::Http(uint16_t port, WebSocket *ws) {
   // set up socket
   _sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (_sockfd == -1) {
-    std::cout << "Unable to create socket" << std::endl;
+    std::cerr << "Unable to create socket" << std::endl;
     exit(1);
   }
 

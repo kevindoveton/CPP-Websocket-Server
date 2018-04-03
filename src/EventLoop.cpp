@@ -51,9 +51,8 @@ void EventLoop::Run() {
       for (int i = 0; i < _nfds; i++) {
         std::cout << "connection" << std::endl;
           Handle_Event_t ev;
-          ev.data.fd = *((int*)_evSet[i].udata);
-          Handler *h = _handlers[ev.data.fd];
-          h->Handle(ev);
+          ev.data.fd = _evSet[i].ident;
+          _handlers[ev.data.fd]->Handle(ev);
       }
 //      printf("Event %" PRIdPTR " occurred.  Filter %d, flags %d, filter flags %s, filter data %" PRIdPTR ", path %s\n",
 //          event_data[0].ident,
@@ -71,7 +70,7 @@ void EventLoop::Run() {
 
 void EventLoop::AddHandler(int fd, Handler *handler, unsigned int events) {
   _handlers[fd] = handler;
-
+  std::cout << "fd " << fd << std::endl;
   #if __linux__
     struct epoll_event e = epoll_event{};
     e.data.fd = fd;
@@ -84,11 +83,11 @@ void EventLoop::AddHandler(int fd, Handler *handler, unsigned int events) {
     std::cout << "Added Handler" << std::endl;
   #endif
   #if __APPLE__
-    int *tmp = (int*)malloc(sizeof(int));
-    *tmp = fd;
-    void *user_data = tmp;
+//    int *tmp = (int*)malloc(sizeof(int));
+//    *tmp = fd;
+//    void *user_data = tmp;
     /* Set up a list of events to monitor. */
-    EV_SET( &_evSet[_currentEventNum], fd, EVFILT_READ, EV_ADD | EV_ONESHOT, 0, 0, user_data);
+    EV_SET( &_evSet[_currentEventNum], fd, EVFILT_READ, EV_ADD | EV_ONESHOT, 0, 0, NULL);
     kevent(_epfd, &_evSet[_currentEventNum], 1, NULL, 0, NULL);
     _currentEventNum++;
   #endif
