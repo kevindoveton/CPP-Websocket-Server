@@ -35,7 +35,7 @@ class Http : public Handler {
     ~Http();
     static std::map<std::string, std::string> ParseHttpHeaders(char *msg, ssize_t readSize);
     int GetFd() { return _sockfd; }
-    int Handle(epoll_event e) override;
+    int Handle(Handle_Event_t e) override;
 
   protected:
     uint16_t _port;

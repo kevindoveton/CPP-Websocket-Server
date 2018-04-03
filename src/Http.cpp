@@ -113,15 +113,11 @@ std::map<std::string, std::string> Http::ParseHttpHeaders(char *msg, ssize_t rea
     }
   }
 
-//  for (const auto &p : header) {
-//    std::cout << "m[" << p.first << "] = " << p.second << '\n';
-//  }
-
   return header;
 }
 
 
-int Http::Handle(epoll_event e) {
+int Http::Handle(Handle_Event_t e) {
   struct sockaddr_in client;
   int clientFd = accept(_sockfd, (struct sockaddr *) &client, (socklen_t *) &_sizeofSock);
   std::cout << "client: "  << clientFd << std::endl;

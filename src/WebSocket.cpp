@@ -11,7 +11,7 @@ void WebSocket::On(int e, WS_CB_FUNC f) {
   _eventFunc[e] = f;
 }
 
-int WebSocket::Handle(epoll_event e) {
+int WebSocket::Handle(Handle_Event_t e) {
   int fd = e.data.fd;
   WebSocketFrame f;
   if (e.events & EPOLLHUP) {
@@ -21,7 +21,7 @@ int WebSocket::Handle(epoll_event e) {
   }
 
   HandlerEvent_t ev;
-  ev.epollEvent = e;
+  ev.handleEvent = e;
   ev.wsFrame = f;
   ev.ws = this;
   ev.wsConnection = _connections[fd];
@@ -54,12 +54,23 @@ int WebSocket::Handle(epoll_event e) {
     default:
       break;
   }
+
+  return -1; // TODO: What should this return
 }
 
 void WebSocket::AddClient(struct sockaddr_in client, int clientFd) {
   SetNonBlocking(clientFd);
   _connections[clientFd] = (new WebSocketConnection(client, clientFd));
   _ev->AddHandler(clientFd, this, EPOLLIN);
+
+  // Run the on open event
+  auto func = _eventFunc.find(OPEN);
+  if (func != _eventFunc.end()) {
+    HandlerEvent_t ev;
+    ev.ws = this;
+    ev.wsConnection = _connections[clientFd];
+    func->second(ev);
+  }
 }
 
 void WebSocket::Broadcast(std::string msg) {

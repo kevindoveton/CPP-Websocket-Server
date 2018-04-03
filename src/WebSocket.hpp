@@ -7,7 +7,6 @@
 
 
 #include <cstdint>
-#include <stdint-gcc.h>
 #include <map>
 #include "Http.hpp"
 #include "Handler.hpp"
@@ -17,9 +16,10 @@
 class WebSocketFrame;
 class WebSocketConnection;
 class Handler;
+class WebSocket;
 
 struct HandlerEvent_t {
-    epoll_event epollEvent;
+    Handle_Event_t handleEvent;
     WebSocketConnection *wsConnection;
     WebSocket *ws;
     WebSocketFrame wsFrame;
@@ -70,7 +70,7 @@ class WebSocket : public Handler {
      * @param {epoll_event} e - the epoll event
      * @return TODO: what should this return
     */
-    int Handle(epoll_event e) override;
+    int Handle(Handle_Event_t e) override;
 
     /*
      * Events enum
