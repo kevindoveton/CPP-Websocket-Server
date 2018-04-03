@@ -22,8 +22,6 @@
 
 #include "Handler.hpp"
 
-#define EPOLL_MAX_EVENTS 10
-
 class Handler;
 
 class EventLoop {
@@ -40,6 +38,13 @@ class EventLoop {
     int _maxEvents;
     int _timeout;
     std::map<int, Handler* > _handlers;
+
+    #if __APPLE__
+      void increaseEventCount();
+      struct kevent *_evSet;
+      struct kevent *_evList;
+      int _currentEventNum;
+    #endif
 };
 
 

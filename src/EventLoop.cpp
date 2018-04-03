@@ -5,7 +5,7 @@
 #include "EventLoop.hpp"
 
 EventLoop::EventLoop() {
-  _maxEvents = EPOLL_MAX_EVENTS;
+  _maxEvents = 10;
   #if __linux__
     _timeout = -1; // block indefinitely
     _epfd = epoll_create1(0);
@@ -13,6 +13,7 @@ EventLoop::EventLoop() {
   #endif
   #if __APPLE__
     _epfd = kqueue();
+    _currentEventNum = 0;
   #endif
 
   std::cout << "Epoll: " << _epfd << std::endl;
@@ -22,18 +23,13 @@ EventLoop::~EventLoop() {
   #if __linux__
   #endif
   #if __APPLE__
+    free(_evSet);
+    free(_evList);
     close(_epfd);
   #endif
 }
 
 void EventLoop::Run() {
-  #if __APPLE__
-  #define KQUEUE_TIMEOUT (125 * 1000000)
-    struct timespec timeout;
-    timeout.tv_nsec = KQUEUE_TIMEOUT; // .125s / 125ms
-    timeout.tv_sec = 0;
-  #endif
-
   while (true) {
     #if __linux__
       struct epoll_event events[EPOLL_MAX_EVENTS];
@@ -45,28 +41,29 @@ void EventLoop::Run() {
       }
     #endif
     #if __APPLE__
-    int event_count = kevent(_epfd, events_to_monitor, NUM_EVENT_SLOTS, event_data, num_files, &timeout);
-    if ((event_count < 0) || (event_data[0].flags == EV_ERROR)) {
+    _nfds = kevent(_epfd, NULL, 0, _evSet, _currentEventNum, NULL);
+    if ((_nfds < 0)) {
       /* An error occurred. */
-      fprintf(stderr, "An error occurred (event count %d).  The error was %s.\n", event_count, strerror(errno));
-      break;
+      fprintf(stderr, "An error occurred (event count %d).  The error was %s.\n", _nfds, strerror(errno));
+//      break;
     }
-    if (event_count) {
-      printf("Event %" PRIdPTR " occurred.  Filter %d, flags %d, filter flags %s, filter data %" PRIdPTR ", path %s\n",
-          event_data[0].ident,
-          event_data[0].filter,
-          event_data[0].flags,
-          flagstring(event_data[0].fflags),
-          event_data[0].data,
-          (char *)event_data[0].udata);
-    } else {
-      printf("No event.\n");
+    if (_nfds) {
+      for (int i = 0; i < _nfds; i++) {
+        std::cout << "connection" << std::endl;
+          Handle_Event_t ev;
+          ev.data.fd = *((int*)_evSet[i].udata);
+          Handler *h = _handlers[ev.data.fd];
+          h->Handle(ev);
+      }
+//      printf("Event %" PRIdPTR " occurred.  Filter %d, flags %d, filter flags %s, filter data %" PRIdPTR ", path %s\n",
+//          event_data[0].ident,
+//          event_data[0].filter,
+//          event_data[0].flags,
+//          flagstring(event_data[0].fflags),
+//          event_data[0].data,
+//          (char *)event_data[0].udata);
     }
 
-    /* Reset the timeout.  In case of a signal interrruption, the
-       values may change. */
-    timeout.tv_sec = 0;
-    timeout.tv_nsec = KQUEUE_TIMEOUT;
     #endif
   }
 
@@ -87,15 +84,23 @@ void EventLoop::AddHandler(int fd, Handler *handler, unsigned int events) {
     std::cout << "Added Handler" << std::endl;
   #endif
   #if __APPLE__
-    unsigned int vnode_events;
-    vnode_events = NOTE_DELETE |  NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-
-    void *user_data;
+    int *tmp = (int*)malloc(sizeof(int));
+    *tmp = fd;
+    void *user_data = tmp;
     /* Set up a list of events to monitor. */
-    EV_SET( &events_to_monitor[0], fd, EVFILT_VNODE, EV_ADD | EV_CLEAR, vnode_events, 0, user_data);
+    EV_SET( &_evSet[_currentEventNum], fd, EVFILT_READ, EV_ADD | EV_ONESHOT, 0, 0, user_data);
+    kevent(_epfd, &_evSet[_currentEventNum], 1, NULL, 0, NULL);
+    _currentEventNum++;
   #endif
 }
 
 void EventLoop::RemoveHandler(int fd) {
 
+}
+
+void EventLoop::increaseEventCount() {
+  _maxEvents = (_maxEvents * 2) + 1;
+  _evList = (struct kevent*)malloc(_maxEvents * sizeof(struct kevent));
+  struct kevent *newEvSet = (struct kevent*)realloc(_evSet, (_maxEvents * sizeof(struct kevent)));
+  _evSet = newEvSet;
 }

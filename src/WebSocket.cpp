@@ -59,6 +59,7 @@ int WebSocket::Handle(Handle_Event_t e) {
 }
 
 void WebSocket::AddClient(struct sockaddr_in client, int clientFd) {
+  std::cout << this << std::endl;
   SetNonBlocking(clientFd);
   _connections[clientFd] = (new WebSocketConnection(client, clientFd));
   _ev->AddHandler(clientFd, this, EPOLLIN);

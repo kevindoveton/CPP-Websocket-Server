@@ -42,7 +42,12 @@ struct Handle_Event_t {
 class Handler {
   public:
     virtual int Handle(Handle_Event_t e) = 0;
-    void inline SetNonBlocking(int fd) { _flags = fcntl(fd, F_GETFL, 0); fcntl(fd, F_SETFL, _flags | O_NONBLOCK);}
+    void inline SetNonBlocking(int fd) {
+      #if __linux__
+      _flags = fcntl(fd, F_GETFL, 0); fcntl(fd, F_SETFL, _flags | O_NONBLOCK);
+      #endif
+    }
+
     void inline SetEventLoopInstance(EventLoop *ev) { _ev = ev; }
 
   protected:
