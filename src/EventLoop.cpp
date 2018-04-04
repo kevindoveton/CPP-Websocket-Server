@@ -87,7 +87,7 @@ void EventLoop::AddHandler(int fd, Handler *handler, unsigned int events) {
 //    *tmp = fd;
 //    void *user_data = tmp;
     /* Set up a list of events to monitor. */
-    EV_SET( &_evSet[_currentEventNum], fd, EVFILT_READ, EV_ADD | EV_ONESHOT, 0, 0, NULL);
+    EV_SET( &_evSet[_currentEventNum], fd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, NULL);
     kevent(_epfd, &_evSet[_currentEventNum], 1, NULL, 0, NULL);
     _currentEventNum++;
   #endif
