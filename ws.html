@@ -34,7 +34,7 @@
           }
 
           ws.onmessage = function (ev) {
-              addMessage(ev.data);
+              addMessage('Received: ' + ev.data);
           }
 
           ws.onclose = function (ev) {
@@ -44,6 +44,7 @@
 
       function send() {
           let msg = document.querySelector('.msg-text').value;
+          addMessage('Sent: ' + msg);
           ws.send(msg);
       }
     </script>

@@ -90,7 +90,14 @@ std::string WebSocketConnection::GetMessage() {
 }
 
 void WebSocketConnection::SendMessage(std::string msg) {
+  std::map<std::string, std::string> m;
+  m["FIN"] = "1";
+  m["OPCODE"] = std::to_string(WebSocketFrame::TEXT);
+  m["PAYLOAD_LENGTH"] = std::to_string(msg.length());
+  m["PAYLOAD_DATA"] = msg;
+  m["MASK"] = "0";
 
+  SendFrame(WebSocketFrame(m));
 }
 
 WebSocketFrame WebSocketConnection::GetFrame() {

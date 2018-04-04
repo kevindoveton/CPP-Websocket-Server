@@ -86,6 +86,7 @@ WebSocketFrame::WebSocketFrame(std::map<std::string, std::string> f) {
   it = f.find("OPCODE");
   if (it != f.end()) {
     _opcode = std::stoi(f["OPCODE"]);
+    std::cout << _opcode << std::endl;
   }
 
   it = f.find("PAYLOAD_LENGTH");
@@ -110,22 +111,27 @@ WebSocketFrame::WebSocketFrame(std::map<std::string, std::string> f) {
 }
 
 std::string WebSocketFrame::GetFrame() {
+  // TODO: support more than 126 chars
   std::string ret;
+
   std::stringstream f;
   f << _fin
-    << "000"
+    << "000" // reserved bits
     << std::bitset<4>(_opcode)
     << _maskBit
     << std::bitset<7>(_payloadLength);
 
-  std::bitset<16> bs;
+  for (int i = 0; i < _payloadData.length(); i++) {
+    f << std::bitset<8>(_payloadData[i]);
+  }
+
+  std::cout << (f.str()) << std::endl;
+
+  std::bitset<8> bs;
   while (f >> bs) {
     ret += static_cast<char>(bs.to_ulong());
   }
 
-//  std::cout << "frame: " << std::endl << f.str() << std::endl;
-
-//  return f.str();
   return ret;
 }
 
