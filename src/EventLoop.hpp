@@ -5,19 +5,29 @@
 #ifndef CPP_WEB_SOCKET_EVENTLOOP_HPP
 #define CPP_WEB_SOCKET_EVENTLOOP_HPP
 
-#include <sys/epoll.h>
+#if __linux__
+  #include <sys/epoll.h>
+#endif
+#if __APPLE__
+  #include <sys/types.h>
+  #include <sys/event.h>
+  #include <sys/time.h>
+  #include <fcntl.h>
+#endif
+
+#include <unistd.h>
 #include <iostream>
 #include <map>
+#include <cinttypes>
+
 #include "Handler.hpp"
 
-#define EPOLL_MAX_EVENTS 10
-
 class Handler;
-class WebSocket;
 
 class EventLoop {
   public:
     EventLoop();
+    ~EventLoop();
     void Run();
     void AddHandler(int fd, Handler *handler, unsigned int events);
     void RemoveHandler(int fd);
@@ -28,6 +38,13 @@ class EventLoop {
     int _maxEvents;
     int _timeout;
     std::map<int, Handler* > _handlers;
+
+    #if __APPLE__
+      void increaseEventCount();
+      struct kevent *_evSet;
+      struct kevent *_evList;
+      int _currentEventNum;
+    #endif
 };
 
 

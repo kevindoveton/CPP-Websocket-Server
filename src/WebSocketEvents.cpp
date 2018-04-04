@@ -6,4 +6,6 @@
 
 void WebSocketEvents::onMsg(HandlerEvent_t e) {
   std::cout << e.wsFrame.GetPayload() << std::endl;
+//  e.ws->Broadcast("Hello");
+  e.wsConnection->SendMessage(e.wsFrame.GetPayload());
 }
